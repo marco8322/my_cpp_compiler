@@ -13,6 +13,17 @@ public:
         FLOAT_LITERAL,
 
         /* keywords */
+        VOID,
+        CHAR,
+        SIGNED,
+        UNSIGNED,
+        SHORT,
+        INT,
+        LONG,
+        STRUCT,
+        UNION,
+        CONST,
+        VOLATILE,
         SIZEOF,
 
         /* other tokens */
