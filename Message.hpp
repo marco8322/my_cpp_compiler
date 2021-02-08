@@ -11,6 +11,6 @@ public:
         ERROR_INVALID_TYPE_COMBO
     };
 
-    virtual void error(Msg msg, std::initializer_list<std::string>> args);
+    virtual void error(Msg msg, std::initializer_list<std::string> args);
 };
 

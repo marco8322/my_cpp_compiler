@@ -12,8 +12,6 @@ public:
 
 
 class TypeNameResolver {
-    std::shared_ptr<Message> message;
-
 public:
     enum Flag {
         CHAR, SHORT, INT, LONG,
@@ -52,6 +50,7 @@ public:
     bool setFlag(Flag flag);
 
 private:
+    std::shared_ptr<Message> message;
     bool typeFlags[NB_FLAGS];
     const char *const nameFlags[NB_FLAGS] = {
         "char", "short", "int", "long", 

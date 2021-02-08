@@ -103,3 +103,8 @@ class StringLiteralToken : public LexerToken {
 
 };
 
+class CharReader {
+public:
+    char getNextChar();
+    char peekNextChar();
+};

@@ -8,7 +8,7 @@
  */
 TypeNameResolver::TypeNameResolver(const std::shared_ptr<Message>& message_) :
         message(message_),
-        typeFlags({false})
+        typeFlags()
         {
             // Nothing else to do
         }
