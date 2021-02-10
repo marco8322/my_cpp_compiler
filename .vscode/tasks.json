@@ -31,6 +31,7 @@
 				"-I.",
 				"./unit_tests/UnitTestLexer.cpp",
 				"Lexer.cpp",
+				"LexerToken.cpp"
 				"-o",
 				"${fileDirname}/unittest"
 			],

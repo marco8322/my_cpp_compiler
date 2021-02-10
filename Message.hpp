@@ -12,6 +12,6 @@ public:
         ERROR_EXPECTED_TOKEN
     };
 
-    virtual void error(Msg msg, std::initializer_list<std::string> args);
+    virtual void error(Msg msg, std::initializer_list<std::string> args) = 0;
 };
 
