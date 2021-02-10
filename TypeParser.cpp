@@ -2,6 +2,10 @@
 #include "TypeParser.hpp"
 #include <cassert>
 
+/**
+ * Default destructor for type parser
+ */
+TypeParser::~TypeParser() = default;
 
 /**
  * Constructor

@@ -20,6 +20,28 @@
 			],
 			"group": "build",
 			"detail": "compiler: /usr/bin/clang"
+		},
+		{
+			"type": "cppbuild",
+			"label": "Unit tests",
+			"command": "/usr/bin/clang++",
+			"args": [
+				"-g",
+				"-std=c++11",
+				"-I.",
+				"./unit_tests/UnitTestLexer.cpp",
+				"Lexer.cpp",
+				"-o",
+				"${fileDirname}/unittest"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: /usr/bin/clang"
 		}
 	]
 }

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Lexer.hpp"
+#include "LexerToken.hpp"
 #include <vector>
 
 class IRType {

@@ -2,6 +2,7 @@
 
 #include "IR.hpp"
 #include "Message.hpp"
+#include "Lexer.hpp"
 
 class TypeParser {
 public:

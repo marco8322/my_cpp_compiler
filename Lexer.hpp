@@ -2,109 +2,48 @@
 #pragma once
 
 #include <memory>
+#include <map>
+#include <string>
+#include "Message.hpp"
+#include "LexerToken.hpp"
+#include "CharReader.hpp"
 
-
-class LexerToken {
-public:
-    enum Kind {
-        IDENTIFIER,
-        STRING_LITERAL,
-        INTEGER_LITERAL,
-        FLOAT_LITERAL,
-
-        /* keywords */
-        VOID,
-        CHAR,
-        SIGNED,
-        UNSIGNED,
-        SHORT,
-        INT,
-        LONG,
-        STRUCT,
-        UNION,
-        CONST,
-        VOLATILE,
-        SIZEOF,
-
-        /* other tokens */
-        LEFT_PARAR,
-        RIGHT_PARAR,
-        LEFT_BRACKET,
-        RIGHT_BRACKET,
-        DOT,
-        LEFT_ARROW,
-        INCR,
-        DECR,
-        COMMA,
-        BIT_AND,
-        BIT_IOR,
-        BIT_XOR,
-        BIT_NOT,
-        BOOL_AND,
-        BOOL_OR,
-        BOOL_NOT,
-        ADD,
-        SUB,
-        MUL,
-        DIV,
-        MOD,
-        SHIFT_LEFT,
-        SHIFT_RIGHT,
-        LT,
-        GT,
-        LE,
-        GE,
-        EQUAL,
-        NOT_EQUAL,
-        QUESTION_MARK,
-        COLON,
-        
-        ASSIGN,
-        MUL_ASSIGN,
-        DIV_ASSIGN,
-        MOD_ASSIGN,
-        ADD_ASSIGN,
-        SUB_ASSIGN,
-        SHIFT_LEFT_ASSIGN,
-        SHIFT_RIGHT_ASSIGN,
-        BIT_AND_ASSIGN,
-        BIT_XOR_ASSIGN,
-        BIT_IOR_ASSIGN
-    };
-
-    Kind getKind() { return kind; }
-    LexerToken(Kind kind_ ) : kind(kind_) { }
-    virtual ~LexerToken();
-
-private:
-    Kind kind;
-
-};
-
+/**
+ * Interface for lexers
+ */
 class Lexer {
 public:
-    virtual std::shared_ptr<LexerToken> nextToken() = 0;
-    virtual std::shared_ptr<LexerToken> peekToken() = 0;
-    virtual std::shared_ptr<LexerToken> acceptToken(LexerToken::Kind) = 0;
-};
-
-using LexerTokenPtr = std::shared_ptr<LexerToken>;
-
-class IdToken : public LexerToken {
-
+    virtual LexerTokenPtr nextToken() = 0;
+    virtual LexerTokenPtr peekToken() = 0;
+    virtual LexerTokenPtr acceptToken(LexerToken::Kind) = 0;
 };
 
 
-class IntLiteralToken : public LexerToken {
 
-};
+using KeywordsMap = std::map<const std::string, LexerTokenPtr>;
 
-class StringLiteralToken : public LexerToken {
-
-};
-
-class CharReader {
+/**
+ * Implementation for the C90 lexer
+ */
+class C90Lexer : public Lexer {
 public:
-    char getNextChar();
-    char peekNextChar();
+    virtual LexerTokenPtr nextToken() override;
+    virtual LexerTokenPtr peekToken() override;
+    virtual LexerTokenPtr acceptToken(LexerToken::Kind) override;
+
+    C90Lexer(const std::shared_ptr<CharReader>& charReader_, const std::shared_ptr<Message>& msg_);
+
+protected:
+ 
+    LexerTokenPtr readIdOrKeyword();
+    LexerTokenPtr readNumber();
+    LexerTokenPtr readOtherToken();
+    void addC90Keywords();
+    void skipWhiteSpaces();
+
+    std::shared_ptr<CharReader> charReader;
+    LexerTokenPtr theNextToken;
+    std::shared_ptr<Message> msg;
+    KeywordsMap keywords;
 };
+
