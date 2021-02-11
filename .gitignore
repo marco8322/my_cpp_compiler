@@ -1,2 +1,4 @@
 .vscode/unittest*
 *~
+unit_tests/bin
+

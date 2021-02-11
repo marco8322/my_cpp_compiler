@@ -43,6 +43,28 @@
 			],
 			"group": "build",
 			"detail": "compiler: /usr/bin/clang"
+		},
+		{
+			"type": "cppbuild",
+			"label": "Test Unit tests",
+			"command": "/usr/bin/clang++",
+			"args": [
+				"-g",
+				"-std=c++11",
+				"-I.",
+				"./unit_tests/TestUnitTest.cpp",
+				"-o",
+				"${fileDirname}/bin/testunittest"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: /usr/bin/clang"
 		}
+
 	]
 }
