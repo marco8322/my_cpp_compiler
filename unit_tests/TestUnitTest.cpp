@@ -3,29 +3,33 @@
 
 void testFail()
 {
-    Assert::fail("call fail");
+    UnitTest::fail("call fail");
 }
 
 void testPassTrue()
 {
-    Assert::assertTrue("call pass 1", true);
+    UnitTest::assertTrue("call pass 1", true);
 }
 
 void testFailTrue()
 {
-    Assert::assertTrue("call pass 2", false);
+    UnitTest::assertTrue("call pass 2", false);
 }
 
 void testPassFalse()
 {
-    Assert::assertFalse("call false 1", false);
+    UnitTest::assertFalse("call false 1", false);
 }
 
 void testFailFalse()
 {
-    Assert::assertTrue("call false 2", false);
+    UnitTest::assertTrue("call false 2", false);
 }
 
+void testUncaughtException()
+{
+    throw 1;
+}
 
 UnitTest::TestPtr runOneTest()
 {
@@ -43,7 +47,8 @@ UnitTest::TestPtr runMultipleTests1()
             UnitTest::makeSimpleTest("Test 2", testPassTrue),
             UnitTest::makeSimpleTest("Test 3", testFailTrue),
             UnitTest::makeSimpleTest("Test 4", testPassFalse),
-            UnitTest::makeSimpleTest("Test 5", testFailFalse)
+            UnitTest::makeSimpleTest("Test 5", testFailFalse),
+            UnitTest::makeSimpleTest("Test 6", testUncaughtException)
         }
     );
 

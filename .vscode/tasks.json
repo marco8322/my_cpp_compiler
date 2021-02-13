@@ -23,7 +23,7 @@
 		},
 		{
 			"type": "cppbuild",
-			"label": "Unit tests",
+			"label": "Lexer unit tests",
 			"command": "/usr/bin/clang++",
 			"args": [
 				"-g",
@@ -33,7 +33,7 @@
 				"Lexer.cpp",
 				"LexerToken.cpp"
 				"-o",
-				"${fileDirname}/unittest"
+				"${fileDirname}/bin/lexer_unittest"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"

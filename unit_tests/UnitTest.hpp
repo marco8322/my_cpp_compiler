@@ -7,8 +7,9 @@
 #include <initializer_list>
 #include <memory>
 #include <vector>
+#include <functional>
 
-namespace Assert {
+namespace UnitTest {
     struct FailException {
         std::string msg;
 
@@ -29,11 +30,8 @@ namespace Assert {
     {
         if( condition ) throw FailException(msg);
     }
-}
 
-namespace UnitTest {
-
-    using UTFunc = void (*)();
+    using UTFunc = std::function<void ()>;
     using UTResults = std::pair<int, int>;
 
     class Test {
@@ -79,8 +77,11 @@ namespace UnitTest {
                 utFunc();
                 std::cout << getTabsStr(nbTabs) << "PASS (" << testName << ")" << std::endl;
                 return std::make_pair<int, int>(1, 0);
-            } catch (Assert::FailException e) {
+            } catch (FailException e) {
                 std::cout << getTabsStr(nbTabs) << "FAIL (" << testName << "): " << e.msg << std::endl;
+                return std::make_pair<int, int>(0, 1);
+            } catch (...) {
+                std::cout << getTabsStr(nbTabs) << "FAIL (" << testName << "): " << "(uncaught exception)" << std::endl;
                 return std::make_pair<int, int>(0, 1);
             }
         }
@@ -89,6 +90,13 @@ namespace UnitTest {
     inline TestPtr makeSimpleTest(const std::string& testName, UTFunc utFunc)
     {
         return std::make_shared<SimpleTest>(testName, utFunc);
+    }
+
+    inline TestPtr makeSimpleTest(const std::string& testName, void (*utFunc)())
+    {
+        auto wrapper = [=](){ utFunc(); };
+
+        return std::make_shared<SimpleTest>(testName, wrapper);
     }
 
     using TestPtrList = std::initializer_list<TestPtr>;

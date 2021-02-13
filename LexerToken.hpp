@@ -20,15 +20,17 @@ public:
         SIGNED, UNSIGNED,
         CHAR, SHORT, INT, LONG,
         FLOAT, DOUBLE,
-        STRUCT, UNION,
+        STRUCT, UNION, ENUM,
         CONST, VOLATILE,
         SIZEOF,
 
         IF, ELSE,
         WHILE, DO, FOR,
         GOTO, BREAK, CONTINUE,
+        SWITCH, CASE, DEFAULT,
         AUTO, REGISTER,
         TYPEDEF, RETURN,
+        EXTERN, STATIC,
 
         /* other tokens */
         LEFT_PARAR, RIGHT_PARAR, LEFT_BRACKET, RIGHT_BRACKET,

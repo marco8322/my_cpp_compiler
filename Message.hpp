@@ -7,6 +7,7 @@
 class Message {
 public:
     enum Msg {
+        NO_ERROR,
         ERROR_DUPLICATE_TYPE,
         ERROR_INVALID_TYPE_COMBO,
         ERROR_EXPECTED_TOKEN

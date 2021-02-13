@@ -38,18 +38,26 @@ std::shared_ptr<LexerToken> C90Lexer::peekToken()
         // If this is a letter or _, this is either a id or a keyword
         //
         if( std::isalpha(nextChar) || nextChar == '_' ) {
-            return readIdOrKeyword();
+            theNextToken = readIdOrKeyword();
         }
     
         // else if this is a number, get a number
         //
-        if( std::isdigit(nextChar) ) {
-            return readNumber();
+        else if( std::isdigit(nextChar) ) {
+            theNextToken = readNumber();
+        }
+
+        // EOF
+        //
+        else if( nextChar == EOF ) {
+            theNextToken = std::make_shared<SimpleToken>(LexerToken::END_OF_FILE);
         }
 
         // Check for another token
         //
-        theNextToken = readOtherToken();
+        else {
+            theNextToken = readOtherToken();
+        }
     }
 
     return theNextToken;
@@ -60,12 +68,13 @@ std::shared_ptr<LexerToken> C90Lexer::peekToken()
  */
 std::shared_ptr<LexerToken> C90Lexer::acceptToken(LexerToken::Kind expectedKind) 
 {
-    std::shared_ptr<LexerToken> result = nextToken();
+    std::shared_ptr<LexerToken> result = peekToken();
     if( result->getKind() != expectedKind ) {
         msg->error(Message::ERROR_EXPECTED_TOKEN, {"<need appropriate string>"});
         return nullptr;
     }
 
+    theNextToken = nullptr;
     return result;
 }
 
@@ -122,6 +131,15 @@ std::shared_ptr<LexerToken> C90Lexer::readOtherToken()
                 return std::make_shared<SimpleToken>(LexerToken::ADD);
             }
         }
+
+        case '=': {
+            if( nextChar1 == '=' ) {
+                charReader->getNextChar();
+                return std::make_shared<SimpleToken>(LexerToken::EQUAL);
+            } else {
+                return std::make_shared<SimpleToken>(LexerToken::ASSIGN);
+            }
+        }
     }
 
     return nullptr;
@@ -157,16 +175,23 @@ void C90Lexer::addC90Keywords()
     keywords["double"]   = std::make_shared<SimpleToken>(LexerToken::DOUBLE);
     keywords["struct"]   = std::make_shared<SimpleToken>(LexerToken::STRUCT);
     keywords["union"]    = std::make_shared<SimpleToken>(LexerToken::UNION);
+    keywords["enum"]     = std::make_shared<SimpleToken>(LexerToken::ENUM);
     keywords["const"]    = std::make_shared<SimpleToken>(LexerToken::CONST);
     keywords["volatile"] = std::make_shared<SimpleToken>(LexerToken::VOLATILE);
+    keywords["extern"]   = std::make_shared<SimpleToken>(LexerToken::EXTERN);
+    keywords["static"]   = std::make_shared<SimpleToken>(LexerToken::STATIC);
 
     keywords["if"]       = std::make_shared<SimpleToken>(LexerToken::IF);
     keywords["else"]     = std::make_shared<SimpleToken>(LexerToken::ELSE);
     keywords["do"]       = std::make_shared<SimpleToken>(LexerToken::DO);
     keywords["for"]      = std::make_shared<SimpleToken>(LexerToken::FOR);
+    keywords["while"]    = std::make_shared<SimpleToken>(LexerToken::WHILE);
     keywords["goto"]     = std::make_shared<SimpleToken>(LexerToken::GOTO);
     keywords["break"]    = std::make_shared<SimpleToken>(LexerToken::BREAK);
     keywords["continue"] = std::make_shared<SimpleToken>(LexerToken::CONTINUE);
+    keywords["switch"]   = std::make_shared<SimpleToken>(LexerToken::SWITCH);
+    keywords["case"]     = std::make_shared<SimpleToken>(LexerToken::CASE);
+    keywords["default"]  = std::make_shared<SimpleToken>(LexerToken::DEFAULT);
     keywords["auto"]     = std::make_shared<SimpleToken>(LexerToken::AUTO);
     keywords["register"] = std::make_shared<SimpleToken>(LexerToken::REGISTER);
     keywords["typedef"]  = std::make_shared<SimpleToken>(LexerToken::TYPEDEF);
