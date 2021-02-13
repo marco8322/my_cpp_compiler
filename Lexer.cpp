@@ -11,7 +11,7 @@ C90Lexer::C90Lexer(
         ) 
     : charReader(charReader_), theNextToken(nullptr), msg(msg_)
 { 
-    addC90Keywords();
+    addC90KeywordsAndOperators();
 }
 
 /**
@@ -119,27 +119,126 @@ std::shared_ptr<LexerToken> C90Lexer::readOtherToken()
     int firstChar = charReader->getNextChar();
     int nextChar1 = charReader->peekNextChar();
 
+    auto acceptAndReturn = [&](const std::string& op) {
+        charReader->getNextChar();
+        return operators[op];
+    };
+
     switch( firstChar ) {
         case '+': {
-            if( nextChar1 == '+' ) {
-                charReader->getNextChar();
-                return std::make_shared<SimpleToken>(LexerToken::INCR);
-            } else if( nextChar1 == '=' ) {
-                charReader->getNextChar();
-                return std::make_shared<SimpleToken>(LexerToken::ADD_ASSIGN);
-            } else {
-                return std::make_shared<SimpleToken>(LexerToken::ADD);
+            switch( nextChar1 ) {
+                case '+': return acceptAndReturn("++");
+                case '=': return acceptAndReturn("+=");
+                default: return operators["+"];
+            }
+        }
+
+        case '-': {
+            switch( nextChar1 ) {
+                case '-': return acceptAndReturn("--");
+                case '=': return acceptAndReturn("-=");
+                case '>': return acceptAndReturn("->");
+                default: return operators["-"];
+            }
+        }
+
+        case '*': {
+            switch( nextChar1 ) {
+                case '=': return acceptAndReturn("*=");
+                default: return operators["*"];
+            }
+        }
+
+        case '/': {
+            switch( nextChar1 ) {
+                case '=': return acceptAndReturn("/=");
+                case '*': /* TODO: skip comments */
+                default: return operators["/"];
+            }
+        }
+
+        case '%': {
+            switch( nextChar1 ) {
+                case '=': return acceptAndReturn("%=");
+                default: return operators["%"];
+            }
+        }
+
+        case '&': {
+            switch( nextChar1 ) {
+                case '=': return acceptAndReturn("&=");
+                case '&': return acceptAndReturn("&&");
+                default: return operators["&"];
+            }
+        }
+
+        case '|': {
+            switch( nextChar1 ) {
+                case '=': return acceptAndReturn("|=");
+                case '|': return acceptAndReturn("||");
+                default: return operators["|"];
+            }
+        }
+
+        case '^': {
+            switch( nextChar1 ) {
+                case '=': return acceptAndReturn("^=");
+                default: return operators["^"];
+            }
+        }
+
+        case '~': return operators["~"];
+
+        case '!': {
+            switch( nextChar1 )
+            {
+                case '=': return acceptAndReturn("!=");
+                default: return operators["!"];
+            }
+        }
+
+        case '<': {
+            switch( nextChar1 ) {
+                case '=': return acceptAndReturn("<=");
+                case '<': {
+                    charReader->getNextChar();
+                    if( charReader->peekNextChar() == '=' ) {
+                        return acceptAndReturn("<<=");
+                    } else {
+                        return operators["<<"];
+                    }
+                }
+                default: return operators["<"];
+            }
+        }
+
+        case '>': {
+            switch( nextChar1 ) {
+                case '=': return acceptAndReturn(">=");
+                case '>': {
+                    charReader->getNextChar();
+                    if( charReader->peekNextChar() == '=' ) {
+                        return acceptAndReturn(">>=");
+                    } else {
+                        return operators[">>"];
+                    }
+                }
+                default: return operators[">"];
             }
         }
 
         case '=': {
-            if( nextChar1 == '=' ) {
-                charReader->getNextChar();
-                return std::make_shared<SimpleToken>(LexerToken::EQUAL);
-            } else {
-                return std::make_shared<SimpleToken>(LexerToken::ASSIGN);
+            switch( nextChar1 ) {
+                case '=': return acceptAndReturn("==");
+                default: return operators["="];
             }
         }
+
+        case '.': return operators["."];
+        case '(': return operators["("];
+        case ')': return operators[")"];
+        case '[': return operators["["];
+        case ']': return operators["]"];
     }
 
     return nullptr;
@@ -161,7 +260,7 @@ void C90Lexer::skipWhiteSpaces()
 /**
  * Initialize the keywords map with the C90 keywords
  */
-void C90Lexer::addC90Keywords()
+void C90Lexer::addC90KeywordsAndOperators()
 {
     keywords["sizeof"]   = std::make_shared<SimpleToken>(LexerToken::SIZEOF);
     keywords["char"]     = std::make_shared<SimpleToken>(LexerToken::CHAR);
@@ -196,5 +295,42 @@ void C90Lexer::addC90Keywords()
     keywords["register"] = std::make_shared<SimpleToken>(LexerToken::REGISTER);
     keywords["typedef"]  = std::make_shared<SimpleToken>(LexerToken::TYPEDEF);
     keywords["return"]   = std::make_shared<SimpleToken>(LexerToken::RETURN);
+
+    operators["="]       = std::make_shared<SimpleToken>(LexerToken::ASSIGN);
+    operators["+="]      = std::make_shared<SimpleToken>(LexerToken::ADD_ASSIGN);
+    operators["-="]      = std::make_shared<SimpleToken>(LexerToken::SUB_ASSIGN);
+    operators["*="]      = std::make_shared<SimpleToken>(LexerToken::MUL_ASSIGN);
+    operators["/="]      = std::make_shared<SimpleToken>(LexerToken::DIV_ASSIGN);
+    operators["%="]      = std::make_shared<SimpleToken>(LexerToken::MOD_ASSIGN);
+    operators["&="]      = std::make_shared<SimpleToken>(LexerToken::BIT_AND_ASSIGN);
+    operators["|="]      = std::make_shared<SimpleToken>(LexerToken::BIT_IOR_ASSIGN);
+    operators["^="]      = std::make_shared<SimpleToken>(LexerToken::BIT_XOR_ASSIGN);
+    operators["<<="]     = std::make_shared<SimpleToken>(LexerToken::SHIFT_LEFT_ASSIGN);
+    operators[">>="]     = std::make_shared<SimpleToken>(LexerToken::SHIFT_RIGHT_ASSIGN);
+    operators["++"]      = std::make_shared<SimpleToken>(LexerToken::INCR);
+    operators["--"]      = std::make_shared<SimpleToken>(LexerToken::DECR);
+    operators["+"]       = std::make_shared<SimpleToken>(LexerToken::ADD);
+    operators["-"]       = std::make_shared<SimpleToken>(LexerToken::SUB);
+    operators["*"]       = std::make_shared<SimpleToken>(LexerToken::MUL);
+    operators["+"]       = std::make_shared<SimpleToken>(LexerToken::DIV);
+    operators["%"]       = std::make_shared<SimpleToken>(LexerToken::MOD);
+    operators["&"]       = std::make_shared<SimpleToken>(LexerToken::BIT_AND);
+    operators["|"]       = std::make_shared<SimpleToken>(LexerToken::BIT_IOR);
+    operators["^"]       = std::make_shared<SimpleToken>(LexerToken::BIT_XOR);
+    operators["~"]       = std::make_shared<SimpleToken>(LexerToken::BIT_NOT);
+    operators["!"]       = std::make_shared<SimpleToken>(LexerToken::BOOL_NOT);
+    operators["&&"]      = std::make_shared<SimpleToken>(LexerToken::BOOL_AND);
+    operators["||"]      = std::make_shared<SimpleToken>(LexerToken::BOOL_NOT);
+    operators["."]       = std::make_shared<SimpleToken>(LexerToken::DOT);
+    operators["->"]      = std::make_shared<SimpleToken>(LexerToken::LEFT_ARROW);
+    operators["?"]       = std::make_shared<SimpleToken>(LexerToken::QUESTION_MARK);
+    operators[":"]       = std::make_shared<SimpleToken>(LexerToken::COLON);
+    operators[","]       = std::make_shared<SimpleToken>(LexerToken::COMMA);
+    operators["["]       = std::make_shared<SimpleToken>(LexerToken::LEFT_BRACKET);
+    operators["]"]       = std::make_shared<SimpleToken>(LexerToken::RIGHT_BRACKET);
+    operators["("]       = std::make_shared<SimpleToken>(LexerToken::LEFT_PARAR);
+    operators[")"]       = std::make_shared<SimpleToken>(LexerToken::RIGHT_PARAR);
+    operators["..."]     = std::make_shared<SimpleToken>(LexerToken::DOT_DOT_DOT);
+
 }
 

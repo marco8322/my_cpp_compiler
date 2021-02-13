@@ -14,5 +14,6 @@ public:
     };
 
     virtual void error(Msg msg, std::initializer_list<std::string> args) = 0;
+    virtual ~Message() = default;
 };
 

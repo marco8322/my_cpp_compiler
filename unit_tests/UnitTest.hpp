@@ -59,6 +59,8 @@ namespace UnitTest {
 
             return result;
         }
+
+        virtual ~Test() = default;
     };
 
     using TestPtr = std::shared_ptr<Test>;

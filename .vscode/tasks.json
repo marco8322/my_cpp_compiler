@@ -28,10 +28,11 @@
 			"args": [
 				"-g",
 				"-std=c++11",
+				"-Wall",
 				"-I.",
 				"./unit_tests/UnitTestLexer.cpp",
 				"Lexer.cpp",
-				"LexerToken.cpp"
+				"LexerToken.cpp",
 				"-o",
 				"${fileDirname}/bin/lexer_unittest"
 			],

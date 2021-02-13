@@ -38,12 +38,13 @@ protected:
     LexerTokenPtr readIdOrKeyword();
     LexerTokenPtr readNumber();
     LexerTokenPtr readOtherToken();
-    void addC90Keywords();
+    void addC90KeywordsAndOperators();
     void skipWhiteSpaces();
 
     std::shared_ptr<CharReader> charReader;
     LexerTokenPtr theNextToken;
     std::shared_ptr<Message> msg;
     KeywordsMap keywords;
+    KeywordsMap operators;
 };
 

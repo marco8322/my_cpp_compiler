@@ -33,6 +33,7 @@ public:
         EXTERN, STATIC,
 
         /* other tokens */
+        BEGIN_TOKEN_OP,
         LEFT_PARAR, RIGHT_PARAR, LEFT_BRACKET, RIGHT_BRACKET,
         DOT, LEFT_ARROW,
         INCR, DECR,
@@ -43,12 +44,13 @@ public:
         SHIFT_LEFT,
         SHIFT_RIGHT,
         LT, GT, LE, GE, EQUAL, NOT_EQUAL,
-        QUESTION_MARK, COLON,
+        QUESTION_MARK, COLON, DOT_DOT_DOT,
         
         ASSIGN,
         MUL_ASSIGN, DIV_ASSIGN, MOD_ASSIGN, ADD_ASSIGN, SUB_ASSIGN,
         SHIFT_LEFT_ASSIGN, SHIFT_RIGHT_ASSIGN,
         BIT_AND_ASSIGN, BIT_XOR_ASSIGN, BIT_IOR_ASSIGN,
+        END_TOKEN_OP,
 
         END_OF_FILE
     };
@@ -79,7 +81,7 @@ public:
 class IdToken : public LexerToken {
 public:
     IdToken(const std::string&) : LexerToken(LexerToken::IDENTIFIER) { }
-    ~IdToken() = default;
+    virtual ~IdToken() = default;
 };
 
 /**

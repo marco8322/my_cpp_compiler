@@ -5,6 +5,7 @@
 
 #include "Lexer.hpp"
 #include "UnitTest.hpp"
+#include <initializer_list>
 
 /**
  * My own char reader with a string
@@ -222,8 +223,8 @@ void testC90OtherKeywords()
 UnitTest::TestPtr makeLexerUnitTest(
     const std::string& testName,
     const std::string& charReaderStr,
-    const std::initializer_list<std::string>& testStrs,
-    const std::initializer_list<LexerToken::Kind>& expectedTokens
+    const std::initializer_list<std::string> &testStrs,
+    const std::initializer_list<LexerToken::Kind> &expectedTokens
 )
 {
     if( testStrs.size() != expectedTokens.size() ) {
@@ -231,15 +232,18 @@ UnitTest::TestPtr makeLexerUnitTest(
         std::exit(1);
     }
 
+    std::vector<std::string> theTestStrs(testStrs);
+    std::vector<LexerToken::Kind> theExpectedTokens(expectedTokens);
+
     auto func = [=](){
         std::shared_ptr<CharReader> myReader = std::make_shared<MyCharReader>(charReaderStr);
         std::shared_ptr<MyMessage> myMessage = std::make_shared<MyMessage>();
         C90Lexer c90Lexer(myReader, myMessage);
 
-        auto testStrsIter = testStrs.begin();
-        auto expectedTokensIter = expectedTokens.begin();
+        auto testStrsIter = theTestStrs.begin();
+        auto expectedTokensIter = theExpectedTokens.begin();
 
-        while( testStrsIter != testStrs.end() ) {
+        while( testStrsIter != theTestStrs.end() ) {
             LexerTokenPtr nextToken = c90Lexer.nextToken();
             std::string nullPtrCheckStr(*testStrsIter);
             nullPtrCheckStr += " (null ptr)";
@@ -266,9 +270,11 @@ UnitTest::TestPtr buildTests()
             UnitTest::makeSimpleTest("testC90OtherKeywords", testC90OtherKeywords),
             makeLexerUnitTest(
                 "testC90AssignOps", 
-                "= +=",
-                {"Test =", "Test +="},
-                {LexerToken::ASSIGN, LexerToken::ADD_ASSIGN}
+                "= += -= *= /= %=",
+                {"Test =", "Test +=", "Test -=", "Test *=", "Test /=", "Test %="},
+                {LexerToken::ASSIGN, LexerToken::ADD_ASSIGN, LexerToken::SUB_ASSIGN,
+                    LexerToken::MUL_ASSIGN, LexerToken::DIV_ASSIGN,
+                    LexerToken::MOD_ASSIGN}
             )
         }
     );
