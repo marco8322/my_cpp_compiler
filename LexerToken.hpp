@@ -10,7 +10,7 @@
 class LexerToken {
 public:
     enum Kind {
-        IDENTIFIER,
+        IDENTIFIER = 1,
         STRING_LITERAL,
         INTEGER_LITERAL,
         FLOAT_LITERAL,

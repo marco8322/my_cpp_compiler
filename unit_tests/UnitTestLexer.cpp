@@ -248,6 +248,9 @@ UnitTest::TestPtr makeLexerUnitTest(
             std::string nullPtrCheckStr(*testStrsIter);
             nullPtrCheckStr += " (null ptr)";
             UnitTest::assertTrue(nullPtrCheckStr, nextToken != nullptr);
+            if( nextToken->getKind() != *expectedTokensIter) {
+                std::cout << "Values: " << nextToken->getKind() << ", " << *expectedTokensIter << std::endl;
+            }
             UnitTest::assertTrue(*testStrsIter, nextToken->getKind() == *expectedTokensIter);
             ++testStrsIter;
             ++expectedTokensIter;
@@ -260,7 +263,7 @@ UnitTest::TestPtr makeLexerUnitTest(
 /**
  * Build the unit test object
  */
-UnitTest::TestPtr buildTests()
+UnitTest::TestPtr buildLexerUnitTests()
 {
     return UnitTest::makeMultipleTest(
         "All lexer tests",
@@ -270,11 +273,60 @@ UnitTest::TestPtr buildTests()
             UnitTest::makeSimpleTest("testC90OtherKeywords", testC90OtherKeywords),
             makeLexerUnitTest(
                 "testC90AssignOps", 
-                "= += -= *= /= %=",
-                {"Test =", "Test +=", "Test -=", "Test *=", "Test /=", "Test %="},
+                "= += -= *= /= %= &= |= ^= <<= >>=",
+                {"Test =", "Test +=", "Test -=", "Test *=", "Test /=", "Test %=",
+                    "Test &=", "Test |=", "Test ^=", "Test <<=", "Test >>="},
                 {LexerToken::ASSIGN, LexerToken::ADD_ASSIGN, LexerToken::SUB_ASSIGN,
                     LexerToken::MUL_ASSIGN, LexerToken::DIV_ASSIGN,
-                    LexerToken::MOD_ASSIGN}
+                    LexerToken::MOD_ASSIGN, LexerToken::BIT_AND_ASSIGN,
+                    LexerToken::BIT_IOR_ASSIGN, LexerToken::BIT_XOR_ASSIGN,
+                    LexerToken::SHIFT_LEFT_ASSIGN, LexerToken::SHIFT_RIGHT_ASSIGN}
+            ),
+            makeLexerUnitTest(
+                "testIncrDecr",
+                "++ --",
+                {"Test ++", "Test --"},
+                {LexerToken::INCR, LexerToken::DECR}
+            ),
+            makeLexerUnitTest(
+                "testC90ArithOps", 
+                "+ - * / % & | ^ << >> ~",
+                {"Test +", "Test -", "Test *", "Test /", "Test %",
+                    "Test &", "Test |", "Test ^", "Test <<", "Test >>", "Test ~"},
+                {LexerToken::ADD, LexerToken::SUB,
+                    LexerToken::MUL, LexerToken::DIV,
+                    LexerToken::MOD, LexerToken::BIT_AND,
+                    LexerToken::BIT_IOR, LexerToken::BIT_XOR,
+                    LexerToken::SHIFT_LEFT, LexerToken::SHIFT_RIGHT,
+                    LexerToken::BIT_NOT}
+            ),
+            makeLexerUnitTest(
+                "testC90BoolOps", 
+                "&& || !",
+                {"Test &&", "Test ||", "Test !"},
+                {LexerToken::BOOL_AND, LexerToken::BOOL_OR, LexerToken::BOOL_NOT}
+            ),
+            makeLexerUnitTest(
+                "testC90CompareOps",
+                "< <= > >= == !=",
+                {"Test <", "Test <=", "Test >", "Test >=", "Test ==", "Test !="},
+                {LexerToken::LT, LexerToken::LE, LexerToken::GT,
+                    LexerToken::GE, LexerToken::EQUAL, LexerToken::NOT_EQUAL}
+            ),
+            makeLexerUnitTest(
+                "testC90MemberAccessOps",
+                "[ ] -> .",
+                {"Test [", "Test ]", "Test ->", "Test ."},
+                {LexerToken::LEFT_BRACKET, LexerToken::RIGHT_BRACKET, 
+                    LexerToken::LEFT_ARROW, LexerToken::DOT}
+            ),
+            makeLexerUnitTest(
+                "testC90MemberOtherOps",
+                "( ) , ? : ...",
+                {"Test (", "Test )", "Test ,", "Test ?", "Test :", "Test ..."},
+                {LexerToken::LEFT_PARAR, LexerToken::RIGHT_PARAR, 
+                    LexerToken::COMMA, LexerToken::QUESTION_MARK,
+                    LexerToken::COLON, LexerToken::DOT_DOT_DOT}
             )
         }
     );
@@ -285,5 +337,5 @@ UnitTest::TestPtr buildTests()
  */
 int main()
 {
-    return buildTests()->runTest();
+    return buildLexerUnitTests()->runTest();
 }
