@@ -1,3 +1,9 @@
+// LexerToken.hpp
+//
+// Author: Marco Jacques
+//
+// Lexer tokens definition
+//
 
 #pragma once
 
@@ -52,6 +58,8 @@ public:
         BIT_AND_ASSIGN, BIT_XOR_ASSIGN, BIT_IOR_ASSIGN,
         END_TOKEN_OP,
 
+        UNKNOWN,
+
         END_OF_FILE
     };
 
@@ -101,3 +109,17 @@ public:
     StringLiteralToken() : LexerToken(LexerToken::STRING_LITERAL) { }
     ~StringLiteralToken() = default;
 };
+
+/**
+ * Class for unknown tokens
+ */
+class UnknownToken : public LexerToken {
+    int theChar;
+    
+public:
+    UnknownToken(int theChar_) : LexerToken(LexerToken::UNKNOWN), theChar(theChar_) { }
+    ~UnknownToken() = default;
+
+    int getUnknownChar() { return theChar; }
+};
+

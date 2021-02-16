@@ -1,3 +1,9 @@
+// Lexer.hpp
+//
+// Author: Marco Jacques
+//
+// Implementation for the lexer
+//
 #include "Lexer.hpp"
 #include <cctype>
 #include <string>
@@ -260,6 +266,8 @@ std::shared_ptr<LexerToken> C90Lexer::readOtherToken()
         case ']': return operators["]"];
         case '?': return operators["?"];
         case ':': return operators[":"];
+
+        default: return std::make_shared<UnknownToken>(firstChar);
     }
 
     return nullptr;

@@ -1,3 +1,9 @@
+// CharReader.hpp
+//
+// Author: Marco Jacques
+//
+// Class for reading characters
+//
 
 #pragma once
 

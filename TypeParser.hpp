@@ -1,3 +1,9 @@
+// TypeParser.hpp
+//
+// Author: Marco Jacques
+//
+// Type parser definition
+//
 #pragma once
 
 #include "IR.hpp"

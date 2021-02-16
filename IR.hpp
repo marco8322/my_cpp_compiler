@@ -1,3 +1,9 @@
+// IR.hpp
+//
+// Author: Marco Jacques
+//
+// Intermediate representation
+//
 
 #pragma once
 

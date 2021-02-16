@@ -1,5 +1,7 @@
 // UnitTestLexer.cpp
 //
+// Author: Marco Jacques
+//
 // Unit tests for Lexer classes
 //
 

@@ -1,3 +1,9 @@
+// TypeParser.cpp
+//
+// Author: Marco Jacques
+//
+// Type parser implementation
+//
 
 #include "TypeParser.hpp"
 #include <cassert>

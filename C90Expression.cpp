@@ -1,5 +1,7 @@
 // C90Expression.cpp
 //
+// Author: Marco Jacques
+//
 // Expression parsing for C90 
 //
 

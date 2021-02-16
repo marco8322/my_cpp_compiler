@@ -1,3 +1,9 @@
+// Message.hpp
+//
+// Author: Marco Jacques
+//
+// Definition for messaging
+//
 
 #pragma once
 

@@ -1,4 +1,10 @@
 
+// Lexer.hpp
+//
+// Author: Marco Jacques
+//
+// Lexer classes
+//
 #pragma once
 
 #include <memory>
