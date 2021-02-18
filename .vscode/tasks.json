@@ -47,6 +47,29 @@
 		},
 		{
 			"type": "cppbuild",
+			"label": "Phase 1 translation unit tests",
+			"command": "/usr/bin/clang++",
+			"args": [
+				"-g",
+				"-std=c++11",
+				"-Wall",
+				"-I.",
+				"./unit_tests/UnitTestTranslationPhase1.cpp",
+				"C90Preprocess.cpp",
+				"-o",
+				"${fileDirname}/bin/phase1translation_unittest"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: /usr/bin/clang"
+		},
+		{
+			"type": "cppbuild",
 			"label": "Test Unit tests",
 			"command": "/usr/bin/clang++",
 			"args": [

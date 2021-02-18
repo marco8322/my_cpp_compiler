@@ -9,6 +9,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include "Message.hpp"
 
 class CharacterStream {
 private:
@@ -48,6 +49,10 @@ public:
 };
 
 namespace PreprocessorPhase {
-    void convertNewlinesAndTrigraphs(const CharacterStreamList& input, CharacterStreamList& output);
+    void convertNewlinesAndTrigraphs(
+        const CharacterStreamList& input, 
+        CharacterStreamList& output,
+        std::shared_ptr<Message> msg
+    );
 }
 
