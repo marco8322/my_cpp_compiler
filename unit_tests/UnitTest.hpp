@@ -49,6 +49,18 @@ namespace UnitTest {
         if( condition ) throw FailException(msg);
     }
 
+    /**
+     * Check if 2 objects are equal (testing with ==).  If not,  the
+     * unit test fails
+     */
+    template<typename T1, typename T2>
+    void assertEquals(std::string msg, T1&& actual, T2&& expected)
+    {
+        if( actual != expected ) {
+            throw FailException(msg); 
+        }
+    }
+
     using UTFunc = std::function<void ()>;
     using UTResults = std::pair<int, int>;
 

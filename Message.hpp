@@ -16,10 +16,12 @@ public:
         NO_ERROR,
         ERROR_DUPLICATE_TYPE,
         ERROR_INVALID_TYPE_COMBO,
-        ERROR_EXPECTED_TOKEN
+        ERROR_EXPECTED_TOKEN,
+        WARNING_TRIGRAPH_REPLACED,
+        ERROR_UNKNOWN_CHARACTER
     };
 
-    virtual void error(Msg msg, std::initializer_list<std::string> args) = 0;
+    virtual void issueMessage(Msg msg, std::initializer_list<std::string> args) = 0;
     virtual ~Message() = default;
 };
 

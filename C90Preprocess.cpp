@@ -6,10 +6,15 @@
 //
 
 #include "C90Preprocess.hpp"
+#include <map>
+#include <initializer_list>
 
 namespace PreprocessorPhase {
 
-    bool checkIfTrigraphSequenceComing(
+    /**
+     * Check if this is a potential trigraph sequence
+     */
+    static bool checkIfTrigraphSequenceComing(
         std::string::const_iterator& currCharPtr,
         const std::string::const_iterator& endStr
     )
@@ -20,70 +25,43 @@ namespace PreprocessorPhase {
                 );
     }
 
+    /**
+     * Try to do a trigraph sequence.  Return true if a replacement has been done
+     */
     bool replaceC90TrigraphSequences(
         std::string::const_iterator& currCharPtr,
         std::string& currentCharStream
     )
     {
-        /**
-         *  Primary	Trigraph
-            {	??<
-            }	??>
-            [	??(
-            ]	??)
-            #	??=
-            \	??/
-            ^	??'
-            |	??!
-            ~	??-
-         */
-        switch( *(currCharPtr + 2) ) {
-            case '<':
-                currentCharStream.push_back('{');
-                break;
+        // Trigraph mappings ??<first> -> <second>
+        //
+        static std::map<char, char> charMappings(
+            {
+                std::pair<char, char>('<', '{'), std::pair<char, char>('>', '}'),
+                std::pair<char, char>('(', '['), std::pair<char, char>(')', ']'),
+                std::pair<char, char>('=', '#'), std::pair<char, char>('/', '\\'),
+                std::pair<char, char>('\'', '^'), std::pair<char, char>('!', '|'),
+                std::pair<char, char>('-', '~')
+           }
+        );
 
-            case '>':
-                currentCharStream.push_back('{');
-                break;
+        auto iterNewChar = charMappings.find(*(currCharPtr+2));
+        if( iterNewChar != charMappings.end() ) {
+            currentCharStream.push_back(iterNewChar->second);
+            return true;
+        }
+        else {
+            currentCharStream.push_back('?');
+            currentCharStream.push_back('?');
+            currentCharStream.push_back(*(currCharPtr+2));    
 
-            case '(':
-                currentCharStream.push_back('[');
-                break;
-
-            case ')':
-                currentCharStream.push_back(']');
-                break;
-
-            case '=':
-                currentCharStream.push_back('#');
-                break;
-
-            case '/':
-                currentCharStream.push_back('\\');
-                break;
-
-            case '\'':
-                currentCharStream.push_back('^');
-                break;
-
-            case '!':
-                currentCharStream.push_back('|');
-                break;
-
-            case '-':
-                currentCharStream.push_back('~');
-                break;
-
-            default:
-                currentCharStream.push_back('?');
-                currentCharStream.push_back('?');
-                currentCharStream.push_back(*(currCharPtr+2));
-                return false;
-       }
-
-       return true;
+            return false;
+        }
     }
 
+    /**
+     * Convert \r\n replacements and trigraphs.  
+     */
     void convertNewlinesAndTrigraphs(
         const CharacterStreamList& input, 
         CharacterStreamList& output,
@@ -104,39 +82,44 @@ namespace PreprocessorPhase {
 
                 // If this is \r, we cut the line here and remove it
                 //
-                if( *currCharPtr == '\r' ) {
-                    if( currCharPtr+1 != currStreamStr.end() && *(currCharPtr+1) == '\n' ) {
-                        currentCharStream.push_back('\n');
-                        ++currCharPtr;
-                    }     
-                    else {
-                        // issue warning or error that we see a unknown character and skip it
-                        //
-                    }
+                if( *currCharPtr == '\r' && ( currCharPtr+1 != currStreamStr.end() && *(currCharPtr+1) == '\n' ) ) {
+                    currentCharStream.push_back('\n');
+                    ++currCharPtr;
                 }
 
                 // Trigraph translation... try to translate and remove it
                 //
                 else if( checkIfTrigraphSequenceComing(currCharPtr, currStreamStr.end())) {
-                    currentColumn += 2;
                     if( replaceC90TrigraphSequences(currCharPtr, currentCharStream) ) {
                         output.push_back(CharacterStream(currentCharStream, streamListIter->getFile(), streamListIter->getStartLine(), startColumn));
+                        currentColumn += 2;
                         startColumn = currentColumn + 1;
                         currentCharStream.clear();
+                        std::advance(currCharPtr, 2);
 
                         // issue message for trigraph has been translated
+                        //
+                        msg->issueMessage(Message::WARNING_TRIGRAPH_REPLACED, {});
                     }
-
-                    std::advance(currCharPtr, 2);
+                    else {
+                        // Advance only one '?'
+                        //
+                        currentCharStream.push_back('?');
+                    }
                 }
 
                 // any other printable character...
                 // 
-                else if (isprint(*currCharPtr) || isspace(*currCharPtr) ) {
+                else if (isprint(*currCharPtr) || ( isspace(*currCharPtr) && *currCharPtr != '\r') ) {
                     currentCharStream.push_back(*currCharPtr);
                 } 
                 else {
                     // issue warning for unprintable error
+                    //
+                    msg->issueMessage(Message::ERROR_UNKNOWN_CHARACTER, {});
+                    output.push_back(CharacterStream(currentCharStream, streamListIter->getFile(), streamListIter->getStartLine(), startColumn));
+                    startColumn = currentColumn + 1;
+                    currentCharStream.clear();
                 }
 
                 ++currCharPtr;

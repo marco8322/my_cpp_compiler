@@ -8,6 +8,7 @@
 #include "Lexer.hpp"
 #include "UnitTest.hpp"
 #include <initializer_list>
+#include "UnitTestMessage.hpp"
 
 /**
  * My own char reader with a string
@@ -43,35 +44,6 @@ public:
     }
 };
 
-/**
- * My own error messaging
- */
-
-class MyMessage : public Message {
-    Msg msgToSend;
-    std::vector<std::string> msgArgs;
-
-public:
-    virtual void error(Msg msg, std::initializer_list<std::string> args) 
-    { 
-        msgToSend = msg;
-        msgArgs.insert(msgArgs.begin(), args.begin(), args.end());
-    }
-
-    void resetError()
-    {
-        msgToSend = Message::NO_ERROR;
-        msgArgs.clear();
-    }
-
-    bool anyError() 
-    {
-        return msgToSend != NO_ERROR;
-    }
-
-    Msg getMessage() { return msgToSend; }
-    const std::vector<std::string>& getArgs() { return msgArgs; }
-};
 
 /**
  * Basic unit tests for testing the interface of the lexer
@@ -79,7 +51,7 @@ public:
 void basicC90InterfaceTests()
 {
     std::shared_ptr<CharReader> myReader = std::make_shared<MyCharReader>("int myId  char++");
-    std::shared_ptr<MyMessage> myMessage = std::make_shared<MyMessage>();
+    std::shared_ptr<UnitTestMessage> myMessage = std::make_shared<UnitTestMessage>();
 
     C90Lexer c90Lexer(myReader, myMessage);
     LexerTokenPtr token;
@@ -158,7 +130,7 @@ void testC90TypeKeywords()
         " signed unsigned"
         );
 
-    std::shared_ptr<MyMessage> myMessage = std::make_shared<MyMessage>();
+    std::shared_ptr<UnitTestMessage> myMessage = std::make_shared<UnitTestMessage>();
     C90Lexer c90Lexer(myReader, myMessage);
 
     UnitTest::assertTrue("Test void", c90Lexer.nextToken()->getKind() == LexerToken::VOID);
@@ -201,7 +173,7 @@ void testC90OtherKeywords()
         "if else while for do goto break continue switch case default return sizeof"
         );
 
-    std::shared_ptr<MyMessage> myMessage = std::make_shared<MyMessage>();
+    std::shared_ptr<UnitTestMessage> myMessage = std::make_shared<UnitTestMessage>();
     C90Lexer c90Lexer(myReader, myMessage);
 
     UnitTest::assertTrue("Test if", c90Lexer.nextToken()->getKind() == LexerToken::IF);
@@ -239,7 +211,7 @@ UnitTest::TestPtr makeLexerUnitTest(
 
     auto func = [=](){
         std::shared_ptr<CharReader> myReader = std::make_shared<MyCharReader>(charReaderStr);
-        std::shared_ptr<MyMessage> myMessage = std::make_shared<MyMessage>();
+        std::shared_ptr<UnitTestMessage> myMessage = std::make_shared<UnitTestMessage>();
         C90Lexer c90Lexer(myReader, myMessage);
 
         auto testStrsIter = theTestStrs.begin();
