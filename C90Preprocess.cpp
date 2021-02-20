@@ -28,7 +28,7 @@ namespace PreprocessorPhase {
     /**
      * Try to do a trigraph sequence.  Return true if a replacement has been done
      */
-    bool replaceC90TrigraphSequences(
+    static bool replaceC90TrigraphSequences(
         std::string::const_iterator& currCharPtr,
         std::string& currentCharStream
     )
@@ -51,10 +51,6 @@ namespace PreprocessorPhase {
             return true;
         }
         else {
-            currentCharStream.push_back('?');
-            currentCharStream.push_back('?');
-            currentCharStream.push_back(*(currCharPtr+2));    
-
             return false;
         }
     }
@@ -129,6 +125,48 @@ namespace PreprocessorPhase {
             if( !currentCharStream.empty() ) {
                 output.push_back(CharacterStream(currentCharStream, streamListIter->getFile(), streamListIter->getStartLine(), startColumn));
             }
+        }
+    }
+
+    /**
+     * Phase 2 of translation, remove all occurences of backslash + newline
+     */
+    void removeEndOfLineBacklashes(const CharacterStreamList& input, CharacterStreamList& output)
+    {
+        // Loop on all lines, convert \r\n to \n, and convert trigraphs
+        //
+        for( auto streamListIter = input.begin(); streamListIter != input.end(); ++streamListIter ) {
+
+            auto currStr = streamListIter->getStream();
+            int length = currStr.length();
+            char lastChar = currStr[length-1];
+
+            // If the stream ends with backslash + newline, remove those characters
+            //
+            if( lastChar == '\n' ) {
+                if( length >= 2 && currStr[length-2] == '\\' ) {
+                    auto newStr = currStr.substr(0, length-2);
+                    output.push_back(CharacterStream(newStr, streamListIter->getFile(), streamListIter->getStartLine(), streamListIter->getStartColumn()));
+                    continue;
+                }
+            }
+
+            // If the stream ends with backslash, see if the next line is only the '\n', if so
+            // we remove the backslash + and skip next stream
+            //
+            else if( lastChar == '\\' ) {
+                auto nextStream = streamListIter + 1;
+                if( nextStream != input.end() && nextStream->getStream() == "\n" ) {
+                    auto newStr = currStr.substr(0, length-1);
+                    output.push_back(CharacterStream(newStr, streamListIter->getFile(), streamListIter->getStartLine(), streamListIter->getStartColumn()));
+                    ++streamListIter;  // skip over the stream with the newline to remove it
+                    continue;
+                }
+            }
+
+            // Default behavior, keep the current stream
+            //
+            output.push_back(CharacterStream(*streamListIter));
         }
     }
 }

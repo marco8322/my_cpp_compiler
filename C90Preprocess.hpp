@@ -49,10 +49,21 @@ public:
 };
 
 namespace PreprocessorPhase {
+
+    /**
+     * Phase 1 of translation: convert \r\n and trigraphs.  
+     */
+
     void convertNewlinesAndTrigraphs(
         const CharacterStreamList& input, 
         CharacterStreamList& output,
         std::shared_ptr<Message> msg
-    );
+    );    
+    
+    /**
+     * Phase 2 of translation, remove all occurences of backslash + newline
+     */
+    void removeEndOfLineBacklashes(const CharacterStreamList& input, CharacterStreamList& output);
+
 }
 
