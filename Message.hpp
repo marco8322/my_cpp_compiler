@@ -9,6 +9,7 @@
 
 #include <initializer_list>
 #include <string>
+#include "SourcePosition.hpp"
 
 class Message {
 public:
@@ -21,7 +22,7 @@ public:
         ERROR_UNKNOWN_CHARACTER
     };
 
-    virtual void issueMessage(Msg msg, std::initializer_list<std::string> args) = 0;
+    virtual void issueMessage(const SourcePosition& sourcePosition, Msg msg, std::initializer_list<std::string> args) = 0;
     virtual ~Message() = default;
 };
 

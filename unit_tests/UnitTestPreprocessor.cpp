@@ -29,19 +29,19 @@ UnitTest::TestPtr makeTrigraphSuccessTest(const char* testName, char origChar, c
         CharacterStreamList target;
         auto msg = std::make_shared<UnitTestMessage>();
 
-        source.push_back(CharacterStream(originalString, filename, 1, 1));
+        source.push_back(CharacterStream(originalString, SourcePosition(filename, 1, 1)));
 
         PreprocessorPhase::convertNewlinesAndTrigraphs(source, target, msg);
 
         UnitTest::assertEquals("Test size", target.size(), 2);
         UnitTest::assertEquals("CheckStr1", target[0].getStream(), newExpectedString1);
         UnitTest::assertEquals("CheckStr2", target[1].getStream(), newExpectedString2);
-        UnitTest::assertEquals("CheckFile1", target[0].getFile(), filename);
-        UnitTest::assertEquals("CheckFile2", target[1].getFile(), filename);
-        UnitTest::assertEquals("CheckLine1", target[0].getStartLine(), 1);
-        UnitTest::assertEquals("CheckLine2", target[1].getStartLine(), 1);
-        UnitTest::assertEquals("CheckColumn1", target[0].getStartColumn(), 1);
-        UnitTest::assertEquals("CheckColumn2", target[1].getStartColumn(), 6);
+        UnitTest::assertEquals("CheckFile1", target[0].getSourcePosition().getFilename(), filename);
+        UnitTest::assertEquals("CheckFile2", target[1].getSourcePosition().getFilename(), filename);
+        UnitTest::assertEquals("CheckLine1", target[0].getSourcePosition().getLineNumber(), 1);
+        UnitTest::assertEquals("CheckLine2", target[1].getSourcePosition().getLineNumber(), 1);
+        UnitTest::assertEquals("CheckColumn1", target[0].getSourcePosition().getColumnNumber(), 1);
+        UnitTest::assertEquals("CheckColumn2", target[1].getSourcePosition().getColumnNumber(), 6);
 
         UnitTest::assertTrue("Check any error", msg->anyError());
         UnitTest::assertEquals("Check error code", msg->getMessage(), Message::WARNING_TRIGRAPH_REPLACED);
@@ -60,16 +60,16 @@ void testReplaceLineFeedNewlines()
     CharacterStreamList target;
 
     auto filename = std::make_shared<std::string>("myfile2.cpp");
-    source.push_back(CharacterStream("a \r\n", filename, 1, 1));
+    source.push_back(CharacterStream("a \r\n", SourcePosition(filename, 1, 1)));
 
     auto msg = std::make_shared<UnitTestMessage>();
     PreprocessorPhase::convertNewlinesAndTrigraphs(source, target, msg);
 
     UnitTest::assertEquals("Test size", target.size(), 1);
     UnitTest::assertEquals("CheckStr1", target[0].getStream(), "a \n");
-    UnitTest::assertEquals("CheckFile1", target[0].getFile(), filename);
-    UnitTest::assertEquals("CheckLine1", target[0].getStartLine(), 1);
-    UnitTest::assertEquals("CheckColumn1", target[0].getStartColumn(), 1);
+    UnitTest::assertEquals("CheckFile1", target[0].getSourcePosition().getFilename(), filename);
+    UnitTest::assertEquals("CheckLine1", target[0].getSourcePosition().getLineNumber(), 1);
+    UnitTest::assertEquals("CheckColumn1", target[0].getSourcePosition().getColumnNumber(), 1);
 
     UnitTest::assertFalse("Check any error", msg->anyError());
 }
@@ -89,7 +89,7 @@ UnitTest::TestPtr makeTestUnrecognizedCharacters(const char* testName, char theC
         CharacterStreamList target;
         auto msg = std::make_shared<UnitTestMessage>();
 
-        source.push_back(CharacterStream(originalString, filename, 1, 1));
+        source.push_back(CharacterStream(originalString, SourcePosition(filename, 1, 1)));
         PreprocessorPhase::convertNewlinesAndTrigraphs(source, target, msg);
 
         //std::cout << "target: " << target.size() << std::endl;
@@ -97,12 +97,12 @@ UnitTest::TestPtr makeTestUnrecognizedCharacters(const char* testName, char theC
         UnitTest::assertEquals("Test size", target.size(), 2);
         UnitTest::assertEquals("CheckStr1", target[0].getStream(), "a ");
         UnitTest::assertEquals("CheckStr2", target[1].getStream(), " b");
-        UnitTest::assertEquals("CheckFile1", target[0].getFile(), filename);
-        UnitTest::assertEquals("CheckFile2", target[1].getFile(), filename);
-        UnitTest::assertEquals("CheckLine1", target[0].getStartLine(), 1);
-        UnitTest::assertEquals("CheckLine2", target[1].getStartLine(), 1);
-        UnitTest::assertEquals("CheckColumn1", target[0].getStartColumn(), 1);
-        UnitTest::assertEquals("CheckColumn2", target[1].getStartColumn(), 4);
+        UnitTest::assertEquals("CheckFile1", target[0].getSourcePosition().getFilename(), filename);
+        UnitTest::assertEquals("CheckFile2", target[1].getSourcePosition().getFilename(), filename);
+        UnitTest::assertEquals("CheckLine1", target[0].getSourcePosition().getLineNumber(), 1);
+        UnitTest::assertEquals("CheckLine2", target[1].getSourcePosition().getLineNumber(), 1);
+        UnitTest::assertEquals("CheckColumn1", target[0].getSourcePosition().getColumnNumber(), 1);
+        UnitTest::assertEquals("CheckColumn2", target[1].getSourcePosition().getColumnNumber(), 4);
 
         UnitTest::assertTrue("Check any error", msg->anyError());
         UnitTest::assertEquals("Check error code", msg->getMessage(), Message::ERROR_UNKNOWN_CHARACTER);
@@ -122,10 +122,10 @@ void testNonTrigraphs()
     CharacterStreamList target;
 
     auto filename = std::make_shared<std::string>("myfile2.cpp");
-    source.push_back(CharacterStream("a ??? \n", filename, 1, 1));
-    source.push_back(CharacterStream("b ??\r \n", filename, 2, 1));
-    source.push_back(CharacterStream("c ??@ \n", filename, 3, 1));
-    source.push_back(CharacterStream("d ??", filename, 4, 1));
+    source.push_back(CharacterStream("a ??? \n", SourcePosition(filename, 1, 1)));
+    source.push_back(CharacterStream("b ??\r \n", SourcePosition(filename, 2, 1)));
+    source.push_back(CharacterStream("c ??@ \n", SourcePosition(filename, 3, 1)));
+    source.push_back(CharacterStream("d ??", SourcePosition(filename, 4, 1)));
 
     auto msg = std::make_shared<UnitTestMessage>();
     PreprocessorPhase::convertNewlinesAndTrigraphs(source, target, msg);
@@ -180,9 +180,9 @@ void testSimplePhase2()
     CharacterStreamList target;
 
     auto filename = std::make_shared<std::string>("myfile2.cpp");
-    source.push_back(CharacterStream("a \n", filename, 1, 1));
-    source.push_back(CharacterStream("b \\\n", filename, 2, 1));
-    source.push_back(CharacterStream("c\n", filename, 3, 1));
+    source.push_back(CharacterStream("a \n", SourcePosition(filename, 1, 1)));
+    source.push_back(CharacterStream("b \\\n", SourcePosition(filename, 2, 1)));
+    source.push_back(CharacterStream("c\n", SourcePosition(filename, 3, 1)));
 
     PreprocessorPhase::removeEndOfLineBacklashes(source, target);
     UnitTest::assertEquals("test size", target.size(), 3);
@@ -190,17 +190,17 @@ void testSimplePhase2()
     UnitTest::assertEquals("test str2", target[1].getStream(), "b ");
     UnitTest::assertEquals("test str3", target[2].getStream(), "c\n");
 
-    UnitTest::assertEquals("test file1", target[0].getFile(), filename);
-    UnitTest::assertEquals("test file2", target[1].getFile(), filename);
-    UnitTest::assertEquals("test file3", target[2].getFile(), filename);
+    UnitTest::assertEquals("test file1", target[0].getSourcePosition().getFilename(), filename);
+    UnitTest::assertEquals("test file2", target[1].getSourcePosition().getFilename(), filename);
+    UnitTest::assertEquals("test file3", target[2].getSourcePosition().getFilename(), filename);
 
-    UnitTest::assertEquals("test startline1", target[0].getStartLine(), 1);
-    UnitTest::assertEquals("test startline2", target[1].getStartLine(), 2);
-    UnitTest::assertEquals("test startline3", target[2].getStartLine(), 3);
+    UnitTest::assertEquals("test startline1", target[0].getSourcePosition().getLineNumber(), 1);
+    UnitTest::assertEquals("test startline2", target[1].getSourcePosition().getLineNumber(), 2);
+    UnitTest::assertEquals("test startline3", target[2].getSourcePosition().getLineNumber(), 3);
 
-    UnitTest::assertEquals("test column1", target[0].getStartColumn(), 1);    
-    UnitTest::assertEquals("test column1", target[1].getStartColumn(), 1);
-    UnitTest::assertEquals("test column1", target[2].getStartColumn(), 1);
+    UnitTest::assertEquals("test column1", target[0].getSourcePosition().getColumnNumber(), 1);    
+    UnitTest::assertEquals("test column1", target[1].getSourcePosition().getColumnNumber(), 1);
+    UnitTest::assertEquals("test column1", target[2].getSourcePosition().getColumnNumber(), 1);
 }
 
 /**
@@ -212,10 +212,10 @@ void testPhase2CornerCases()
     CharacterStreamList target;
 
     auto filename = std::make_shared<std::string>("myfile2.cpp");
-    source.push_back(CharacterStream("a \\", filename, 1, 1));
-    source.push_back(CharacterStream("b \\", filename, 2, 1));
-    source.push_back(CharacterStream("\n", filename, 2, 4));
-    source.push_back(CharacterStream("c \\", filename, 3, 1));
+    source.push_back(CharacterStream("a \\", SourcePosition(filename, 1, 1)));
+    source.push_back(CharacterStream("b \\", SourcePosition(filename, 2, 1)));
+    source.push_back(CharacterStream("\n", SourcePosition(filename, 2, 4)));
+    source.push_back(CharacterStream("c \\", SourcePosition(filename, 3, 1)));
 
     PreprocessorPhase::removeEndOfLineBacklashes(source, target);
     UnitTest::assertEquals("test size", target.size(), 3);

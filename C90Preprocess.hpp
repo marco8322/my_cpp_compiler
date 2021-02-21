@@ -10,29 +10,24 @@
 #include <memory>
 #include <vector>
 #include "Message.hpp"
+#include "SourcePosition.hpp"
 
 class CharacterStream {
 private:
     std::string stream;
-    std::shared_ptr<std::string> file;
-    int startLine;
-    int startColumn;
+    SourcePosition sourcePosition;
 
 public:
     CharacterStream(
         const std::string stream_, 
-        const std::shared_ptr<std::string> file_,
-        int startLine_,
-        int startColumn_
-        ) : stream(stream_), file(file_), startLine(startLine_), startColumn(startColumn_)
+        SourcePosition sourcePosition_
+        ) : stream(stream_), sourcePosition(sourcePosition_)
         {
             // nothing to do
         }
 
     const std::string& getStream() const { return stream; } 
-    const std::shared_ptr<std::string> getFile() const { return file; }
-    int getStartLine() const { return startLine; }
-    int getStartColumn() const { return startColumn; }
+    const SourcePosition& getSourcePosition() const { return sourcePosition; }
 };
 
 using CharacterStreamList = std::vector<CharacterStream>;

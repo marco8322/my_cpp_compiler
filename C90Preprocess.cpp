@@ -68,11 +68,12 @@ namespace PreprocessorPhase {
         //
         for( auto streamListIter = input.begin(); streamListIter != input.end(); ++streamListIter ) {
             std::string currentCharStream;
-            int currentColumn = streamListIter->getStartColumn();
+            int currentColumn = streamListIter->getSourcePosition().getColumnNumber();
             int startColumn = currentColumn;
 
             const std::string& currStreamStr = streamListIter->getStream();
             auto currCharPtr = currStreamStr.begin();
+            const SourcePosition& currSourcePosition = streamListIter->getSourcePosition();
 
             while( currCharPtr != currStreamStr.end() ) {
 
@@ -87,7 +88,7 @@ namespace PreprocessorPhase {
                 //
                 else if( checkIfTrigraphSequenceComing(currCharPtr, currStreamStr.end())) {
                     if( replaceC90TrigraphSequences(currCharPtr, currentCharStream) ) {
-                        output.push_back(CharacterStream(currentCharStream, streamListIter->getFile(), streamListIter->getStartLine(), startColumn));
+                        output.push_back(CharacterStream(currentCharStream, SourcePosition(currSourcePosition.getFilename(), currSourcePosition.getLineNumber(), startColumn)));
                         currentColumn += 2;
                         startColumn = currentColumn + 1;
                         currentCharStream.clear();
@@ -95,7 +96,7 @@ namespace PreprocessorPhase {
 
                         // issue message for trigraph has been translated
                         //
-                        msg->issueMessage(Message::WARNING_TRIGRAPH_REPLACED, {});
+                        msg->issueMessage(currSourcePosition, Message::WARNING_TRIGRAPH_REPLACED, {});
                     }
                     else {
                         // Advance only one '?'
@@ -112,8 +113,8 @@ namespace PreprocessorPhase {
                 else {
                     // issue warning for unprintable error
                     //
-                    msg->issueMessage(Message::ERROR_UNKNOWN_CHARACTER, {});
-                    output.push_back(CharacterStream(currentCharStream, streamListIter->getFile(), streamListIter->getStartLine(), startColumn));
+                    msg->issueMessage(currSourcePosition, Message::ERROR_UNKNOWN_CHARACTER, {});
+                    output.push_back(CharacterStream(currentCharStream, SourcePosition(currSourcePosition.getFilename(), currSourcePosition.getLineNumber(), startColumn)));
                     startColumn = currentColumn + 1;
                     currentCharStream.clear();
                 }
@@ -123,7 +124,7 @@ namespace PreprocessorPhase {
             }
 
             if( !currentCharStream.empty() ) {
-                output.push_back(CharacterStream(currentCharStream, streamListIter->getFile(), streamListIter->getStartLine(), startColumn));
+                output.push_back(CharacterStream(currentCharStream, SourcePosition(currSourcePosition.getFilename(), currSourcePosition.getLineNumber(), startColumn)));
             }
         }
     }
@@ -146,7 +147,7 @@ namespace PreprocessorPhase {
             if( lastChar == '\n' ) {
                 if( length >= 2 && currStr[length-2] == '\\' ) {
                     auto newStr = currStr.substr(0, length-2);
-                    output.push_back(CharacterStream(newStr, streamListIter->getFile(), streamListIter->getStartLine(), streamListIter->getStartColumn()));
+                    output.push_back(CharacterStream(newStr, streamListIter->getSourcePosition()));
                     continue;
                 }
             }
@@ -158,7 +159,7 @@ namespace PreprocessorPhase {
                 auto nextStream = streamListIter + 1;
                 if( nextStream != input.end() && nextStream->getStream() == "\n" ) {
                     auto newStr = currStr.substr(0, length-1);
-                    output.push_back(CharacterStream(newStr, streamListIter->getFile(), streamListIter->getStartLine(), streamListIter->getStartColumn()));
+                    output.push_back(CharacterStream(newStr, streamListIter->getSourcePosition()));
                     ++streamListIter;  // skip over the stream with the newline to remove it
                     continue;
                 }

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "Message.hpp"
+
 /**
  * My own error messaging
  */
@@ -16,7 +18,7 @@ class UnitTestMessage : public Message {
     std::vector<std::string> msgArgs;
 
 public:
-    virtual void issueMessage(Msg msg, std::initializer_list<std::string> args) 
+    virtual void issueMessage(const SourcePosition& sourcePosition, Msg msg, std::initializer_list<std::string> args) 
     { 
         msgToSend = msg;
         msgArgs.insert(msgArgs.begin(), args.begin(), args.end());
