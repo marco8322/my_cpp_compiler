@@ -76,7 +76,10 @@ std::shared_ptr<LexerToken> C90Lexer::acceptToken(LexerToken::Kind expectedKind)
 {
     std::shared_ptr<LexerToken> result = peekToken();
     if( result->getKind() != expectedKind ) {
-        msg->issueMessage(Message::ERROR_EXPECTED_TOKEN, {"<need appropriate string>"});
+        // TODO: need to handle source position somehow...
+        //
+        SourcePosition dummyPosition(std::make_shared<std::string>("dummy"), 1, 1);
+        msg->issueMessage(dummyPosition, Message::ERROR_EXPECTED_TOKEN, {"<need appropriate string>"});
         return nullptr;
     }
 
@@ -247,7 +250,11 @@ std::shared_ptr<LexerToken> C90Lexer::readOtherToken()
                     charReader->getNextChar();
                     nextChar1 = charReader->peekNextChar();
                     if( nextChar1 != '.' ) {
-                        msg->issueMessage(Message::ERROR_EXPECTED_TOKEN, {"."});
+                        // TODO: need to handle source position somehow...
+                        //
+                        SourcePosition dummyPosition(std::make_shared<std::string>("dummy"), 1, 1);
+
+                        msg->issueMessage(dummyPosition, Message::ERROR_EXPECTED_TOKEN, {"."});
                         return nullptr;
                     }
 

@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "SourcePosition.hpp"
 #include <string>
 
 
@@ -64,7 +65,11 @@ public:
     };
 
     Kind getKind() { return kind; }
-    LexerToken(Kind kind_ ) : kind(kind_) { }
+    LexerToken(Kind kind_) 
+        : kind(kind_)
+    { 
+    }
+
     virtual ~LexerToken() = 0;
 
 private:

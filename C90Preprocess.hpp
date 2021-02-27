@@ -43,8 +43,9 @@ public:
     virtual void doPreprocessor(const CharacterStreamList& input, CharacterStreamList& output) override;
 };
 
-namespace PreprocessorPhase {
 
+class PreprocessorPhases {
+public:
     /**
      * Phase 1 of translation: convert \r\n and trigraphs.  
      */
@@ -60,5 +61,17 @@ namespace PreprocessorPhase {
      */
     void removeEndOfLineBacklashes(const CharacterStreamList& input, CharacterStreamList& output);
 
-}
+private:
+    bool checkIfTrigraphSequenceComing(
+        std::string::const_iterator& currCharPtr,
+        const std::string::const_iterator& endStr
+    );
+
+    bool replaceC90TrigraphSequences(
+        std::string::const_iterator& currCharPtr,
+        std::string& currentCharStream
+    );
+
+};
+
 

@@ -31,7 +31,7 @@ UnitTest::TestPtr makeTrigraphSuccessTest(const char* testName, char origChar, c
 
         source.push_back(CharacterStream(originalString, SourcePosition(filename, 1, 1)));
 
-        PreprocessorPhase::convertNewlinesAndTrigraphs(source, target, msg);
+        PreprocessorPhases().convertNewlinesAndTrigraphs(source, target, msg);
 
         UnitTest::assertEquals("Test size", target.size(), 2);
         UnitTest::assertEquals("CheckStr1", target[0].getStream(), newExpectedString1);
@@ -63,7 +63,7 @@ void testReplaceLineFeedNewlines()
     source.push_back(CharacterStream("a \r\n", SourcePosition(filename, 1, 1)));
 
     auto msg = std::make_shared<UnitTestMessage>();
-    PreprocessorPhase::convertNewlinesAndTrigraphs(source, target, msg);
+    PreprocessorPhases().convertNewlinesAndTrigraphs(source, target, msg);
 
     UnitTest::assertEquals("Test size", target.size(), 1);
     UnitTest::assertEquals("CheckStr1", target[0].getStream(), "a \n");
@@ -90,7 +90,7 @@ UnitTest::TestPtr makeTestUnrecognizedCharacters(const char* testName, char theC
         auto msg = std::make_shared<UnitTestMessage>();
 
         source.push_back(CharacterStream(originalString, SourcePosition(filename, 1, 1)));
-        PreprocessorPhase::convertNewlinesAndTrigraphs(source, target, msg);
+        PreprocessorPhases().convertNewlinesAndTrigraphs(source, target, msg);
 
         //std::cout << "target: " << target.size() << std::endl;
 
@@ -128,7 +128,7 @@ void testNonTrigraphs()
     source.push_back(CharacterStream("d ??", SourcePosition(filename, 4, 1)));
 
     auto msg = std::make_shared<UnitTestMessage>();
-    PreprocessorPhase::convertNewlinesAndTrigraphs(source, target, msg);
+    PreprocessorPhases().convertNewlinesAndTrigraphs(source, target, msg);
 
     UnitTest::assertEquals("Test size", target.size(), 5);
     UnitTest::assertEquals("CheckStr1", target[0].getStream(), "a ??? \n");
@@ -184,7 +184,7 @@ void testSimplePhase2()
     source.push_back(CharacterStream("b \\\n", SourcePosition(filename, 2, 1)));
     source.push_back(CharacterStream("c\n", SourcePosition(filename, 3, 1)));
 
-    PreprocessorPhase::removeEndOfLineBacklashes(source, target);
+    PreprocessorPhases().removeEndOfLineBacklashes(source, target);
     UnitTest::assertEquals("test size", target.size(), 3);
     UnitTest::assertEquals("test str1", target[0].getStream(), "a \n");
     UnitTest::assertEquals("test str2", target[1].getStream(), "b ");
@@ -217,7 +217,7 @@ void testPhase2CornerCases()
     source.push_back(CharacterStream("\n", SourcePosition(filename, 2, 4)));
     source.push_back(CharacterStream("c \\", SourcePosition(filename, 3, 1)));
 
-    PreprocessorPhase::removeEndOfLineBacklashes(source, target);
+    PreprocessorPhases().removeEndOfLineBacklashes(source, target);
     UnitTest::assertEquals("test size", target.size(), 3);
     UnitTest::assertEquals("test str1", target[0].getStream(), "a \\");
     UnitTest::assertEquals("test str2", target[1].getStream(), "b ");
